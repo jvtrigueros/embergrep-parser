@@ -9,6 +9,11 @@
   (println prompt)
   (read-line))
 
+(defn- json->map
+  "Converts a clj-http.client response's JSON body into a Clojure map."
+  [response]
+  (json/read-str (:body response) :key-fn keyword))
+
 (defn authenticate
   "Takes a username and password and returns an authentication token"
   [username password]
@@ -17,7 +22,7 @@
                      :username username
                      :password password}
         response (client/post url {:form-params form-params})
-        body (json/read-str (:body response) :key-fn keyword)]
+        body (json->map response)]
     (select-keys body [:access_token :refresh_token])))
 
 (defn -main
