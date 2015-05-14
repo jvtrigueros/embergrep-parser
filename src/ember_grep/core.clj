@@ -1,7 +1,8 @@
 (ns ember-grep.core
   (:gen-class)
-  (:require [clj-http.client :as client])
-  (:require [clojure.data.json :as json]))
+  (:require [clojure.data.json :as json]
+            [clj-http.client :as client])
+  (:use clojure.pprint))
 
 (def ^:private base-url "https://embergrep.com/")
 
@@ -24,6 +25,14 @@
         response (client/post url {:form-params form-params})
         body (json->map response)]
     (select-keys body [:access_token :refresh_token])))
+
+(defn courses
+  "Given a course slug it returns the course's metadata."
+  [access_token course-slug]
+  (let [url (str base-url "/api/courses/" course-slug "?access_token=" access_token)
+        response (client/get url)
+        body (json->map response)]
+    {:lessons (get-in body [:course 0 :lessons])}))
 
 (defn -main
   "I don't do a whole lot ... yet."
