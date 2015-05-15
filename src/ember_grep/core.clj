@@ -28,11 +28,19 @@
 
 (defn courses
   "Given a course slug it returns the course's metadata."
-  [access_token course-slug]
-  (let [url (str base-url "/api/courses/" course-slug "?access_token=" access_token)
+  [access-token course-slug]
+  (let [url (str base-url "/api/courses/" course-slug "?access_token=" access-token)
         response (client/get url)
         body (json->map response)]
     {:lessons (get-in body [:course 0 :lessons])}))
+
+(defn lessons
+  [access-token lesson-slugs]
+  (let [ids (reduce #(str %1 "&ids[]=" %2) "" lesson-slugs)
+        url (str base-url "/api/lessons" "?access_token=" access-token ids)
+        response (client/get url)
+        body (json->map response)]
+    (:lessons body)))
 
 (defn -main
   "I don't do a whole lot ... yet."
