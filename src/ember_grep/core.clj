@@ -4,7 +4,7 @@
             [clj-http.client :as client])
   (:use clojure.pprint))
 
-(def ^:private base-url "https://embergrep.com/")
+(def ^:private base-url "https://embergrep.com")
 
 (defn- get-input [prompt]
   (println prompt)
