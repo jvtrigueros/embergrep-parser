@@ -27,20 +27,21 @@
     (select-keys body [:access_token :refresh_token])))
 
 (defn courses
-  "Given a course slug it returns the course's metadata."
+  "Given a course slug it returns the course's lessons."
   [access-token course-slug]
   (let [url (str base-url "/api/courses/" course-slug "?access_token=" access-token)
         response (client/get url)
         body (json->map response)]
-    {:lessons (get-in body [:course 0 :lessons])}))
+    (get-in body [:course 0 :lessons])))
 
 (defn lessons
+  "Given a list of lesson slugs, returns a list of expanded lesson content."
   [access-token lesson-slugs]
   (let [ids (reduce #(str %1 "&ids[]=" %2) "" lesson-slugs)
         url (str base-url "/api/lessons" "?access_token=" access-token ids)
         response (client/get url)
         body (json->map response)]
-    (:lessons body)))
+    (map #(select-keys % [:lessonNotes :video :slug :files]) (:lessons body))))
 
 (defn -main
   "I don't do a whole lot ... yet."
