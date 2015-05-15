@@ -35,13 +35,22 @@
     (get-in body [:course 0 :lessons])))
 
 (defn lessons
-  "Given a list of lesson slugs, returns a list of expanded lesson content."
-  [access-token lesson-slugs]
-  (let [ids (reduce #(str %1 "&ids[]=" %2) "" lesson-slugs)
+  "Given a list of lesson ids, returns a list of expanded lesson content."
+  [access-token lesson-ids]
+  (let [ids (reduce #(str %1 "&ids[]=" %2) "" lesson-ids)
         url (str base-url "/api/lessons" "?access_token=" access-token ids)
         response (client/get url)
         body (json->map response)]
     (map #(select-keys % [:lessonNotes :video :slug :files]) (:lessons body))))
+
+(defn lesson-files
+  "Give a list of file ids, return a list of their actual content."
+  [access-token file-ids]
+  (let [ids (reduce #(str %1 "&ids[]=" %2) "" file-ids)
+        url (str base-url "/api/lesson-files" "?access_token=" access-token ids)
+        response (client/get url)
+        body (json->map response)]
+    (map #(select-keys % [:name :contents]) (:lesson-files body))))
 
 (defn -main
   "I don't do a whole lot ... yet."
