@@ -6,10 +6,6 @@
 
 (def ^:private base-url "https://embergrep.com")
 
-(defn- get-input [prompt]
-  (println prompt)
-  (read-line))
-
 (defn- json->map
   "Converts a clj-http.client response's JSON body into a Clojure map."
   [response]
