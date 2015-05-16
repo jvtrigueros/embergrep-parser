@@ -49,10 +49,12 @@
         body (json->map response)]
     (map #(select-keys % [:name :contents]) (:lesson-files body))))
 
-(defn mkdir-p
+(defn- mkdir-p
   ""
   [path]
-  )
+  (let [filtered-path (filter #(not (.contains % ".")) path)
+        joined-path (clojure.string/join (File/separator) filtered-path)]
+    (.mkdirs (File. joined-path))))
 
 (defn save-lesson
   ""
