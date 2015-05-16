@@ -82,7 +82,8 @@
         course "zero-to-prototype"                          ;TODO: This would be dynamically calculated.
         [courses lessons lesson-files] (map #(partial % token) [courses lessons lesson-files])
         lesson-data (lessons (courses course))]
-    (save-lesson (first lesson-data) (lesson-files (:files (first lesson-data))))))
+    (doseq [lesson lesson-data]
+      (future (save-lesson lesson (lesson-files (:files lesson)))))))
 
 (defn -main
   "I don't do a whole lot ... yet."
