@@ -85,7 +85,4 @@
     (doseq [lesson lesson-data]
       (future (save-lesson lesson (lesson-files (:files lesson)))))))
 
-(defn -main
-  "I don't do a whole lot ... yet."
-  [& args]
-  (println (authenticate (get-input "Username: ") (get-input "Password:"))))
+(defn -main [& args] (download "" ""))
