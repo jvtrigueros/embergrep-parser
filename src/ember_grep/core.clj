@@ -2,7 +2,8 @@
   (:gen-class)
   (:require [clojure.data.json :as json]
             [clj-http.client :as client])
-  (:use clojure.pprint))
+  (:use clojure.pprint)
+  (:import (java.io File)))
 
 (def ^:private base-url "https://embergrep.com")
 
@@ -47,6 +48,42 @@
         response (client/get url)
         body (json->map response)]
     (map #(select-keys % [:name :contents]) (:lesson-files body))))
+
+(defn mkdir-p
+  ""
+  [path]
+  )
+
+(defn save-lesson
+  ""
+  [data files]
+  (let [{:keys [lessonNotes video slug]} data]
+    (print "Creating " slug " directory.")
+    ;(.mkdir (File. slug))
+
+    (print slug "Saving notes.")
+    ;(spit (File. (str slug "/notes.md")) lessonNotes)
+
+    (print slug "Saving files.")
+    (doseq [{:keys [name contents]} files]
+      (let [split-name (clojure.string/split name #"/")]
+        (println split-name)
+        ))
+
+    (print slug "Saving video.")
+    ;(with-open [in (clojure.java.io/input-stream (:sourceMp4Hd video))
+    ;            out (clojure.java.io/output-stream (File. (str slug "/lesson.mp4")))]
+    ;  (clojure.java.io/copy in out))
+    ))
+
+(defn download
+  "Download all the content from the EmberGrep website."
+  [username password]
+  (let [token (:access_token (authenticate username password))
+        course "zero-to-prototype"                          ;TODO: This would be dynamically calculated.
+        [courses lessons lesson-files] (map #(partial % token) [courses lessons lesson-files])
+        lesson-data (lessons (courses course))]
+    (save-lesson (first lesson-data) (lesson-files (:files (first lesson-data))))))
 
 (defn -main
   "I don't do a whole lot ... yet."
