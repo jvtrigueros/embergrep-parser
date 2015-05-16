@@ -50,32 +50,29 @@
     (map #(select-keys % [:name :contents]) (:lesson-files body))))
 
 (defn- mkdir-p
-  ""
   [path]
-  (let [filtered-path (filter #(not (.contains % ".")) path)
-        joined-path (clojure.string/join (File/separator) filtered-path)]
-    (.mkdirs (File. joined-path))))
+  (when-let [filtered-path (not-empty (drop-last path))]
+    (.mkdirs (File. (clojure.string/join (File/separator) filtered-path)))))
 
 (defn save-lesson
   ""
   [data files]
   (let [{:keys [lessonNotes video slug]} data]
-    (print "Creating " slug " directory.")
-    ;(.mkdir (File. slug))
+    (println "Creating " slug " directory.")
+    (.mkdir (File. slug))
 
-    (print slug "Saving notes.")
-    ;(spit (File. (str slug "/notes.md")) lessonNotes)
+    (println slug "Saving notes.")
+    (spit (File. (str slug "/notes.md")) lessonNotes)
 
-    (print slug "Saving files.")
+    (println slug "Saving files.")
     (doseq [{:keys [name contents]} files]
-      (let [split-name (clojure.string/split name #"/")]
-        (println split-name)
-        ))
+      (mkdir-p (conj (seq (clojure.string/split name #"/")) slug))
+      (spit (File. (str slug "/" name)) contents))
 
     (print slug "Saving video.")
-    ;(with-open [in (clojure.java.io/input-stream (:sourceMp4Hd video))
-    ;            out (clojure.java.io/output-stream (File. (str slug "/lesson.mp4")))]
-    ;  (clojure.java.io/copy in out))
+    (with-open [in (clojure.java.io/input-stream (:sourceMp4Hd video))
+                out (clojure.java.io/output-stream (File. (str slug "/lesson.mp4")))]
+      (clojure.java.io/copy in out))
     ))
 
 (defn download
